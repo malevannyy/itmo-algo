@@ -15,14 +15,14 @@ duration<long long int, ratio<1, 1000>> now() {
 
 void foo() {
 
-    auto stack = Stack();
+    auto stack = LinkedDeque();
 
     for (int i = 0; i < 1000000; ++i) {
-        stack.push(i);
+        stack.add(i);
     }
 
     for (int i = 0; i < 1000000; ++i) {
-        int e = stack.pop();
+        int e = stack.remove();
         printf("%d\n", e);
         // cout << e << nl;
     }
