@@ -15,7 +15,7 @@ duration<long long int, ratio<1, 1000>> now() {
 
 void foo() {
 
-    auto stack = LinkedDeque();
+    auto stack = LinkedQueue();
 
     for (int i = 0; i < 1000000; ++i) {
         stack.add(i);

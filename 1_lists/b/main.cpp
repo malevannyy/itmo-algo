@@ -15,7 +15,7 @@ public:
     virtual ~Queue() = default;
 };
 
-class LinkedDeque : Queue {
+class LinkedQueue : Queue {
 private:
     struct Node {
         E e;
@@ -33,7 +33,7 @@ private:
     Node *tail = nullptr;
 
 public:
-    LinkedDeque() = default;
+    LinkedQueue() = default;
 
     void add(E e) override {
         const auto n = new Node(e);
@@ -73,7 +73,7 @@ int main() {
 
     int n;
     cin >> n;
-    auto deque = LinkedDeque();
+    auto deque = LinkedQueue();
     for (int i = 0; i < n; i++) {
         char op;
         cin >> op;
