@@ -28,9 +28,13 @@ int main() {
 
     Node *root = nullptr;
 
-    for (int i = 1; i <= n; ++i) {
+    for (int i = 0; i < n; ++i) {
         T x;
         scanf("%d", &x);
+
+        // fixme
+        if (x < 0) break;
+
         root = insert(root, x);
     }
 
