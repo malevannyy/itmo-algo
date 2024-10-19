@@ -1,46 +1,108 @@
-#include <iostream>
+#include <cstdio>
 
-#define E int
+#define T int
 
-using namespace std;
+struct Node {
+    T key;
+    Node *parent;
+    Node *left;
+    Node *right;
 
-bool check(const int *coords, unsigned n, unsigned k, int x) {
-    int items = 1;
-    int last = coords[0];
-    for (int i = 0; i < n; ++i) {
-        int c = coords[i];
-        if (c - last >= x) {
-            items++;
-            last = c;
-        }
+    explicit Node(T key) {
+        this->key = key;
+        this->parent = nullptr;
+        this->left = nullptr;
+        this->right = nullptr;
     }
-    return items >= k;
-}
+};
+
+Node *insert(Node *, T);
+
+Node *next(Node *, unsigned, unsigned);
+
+void traverse(Node *root);
 
 int main() {
-    std::ios::sync_with_stdio(false);
+    unsigned n;
+    scanf("%d", &n);
 
-    unsigned n, k;
-    // 2 <= места
-    cin >> n;
-    // 1 < бояре < n
-    cin >> k;
+    Node *root = nullptr;
 
-    int coords[n];
-    for (int i = 0; i < n; ++i) {
-        cin >> coords[i];
+    for (int i = 1; i <= n; ++i) {
+        T x;
+        scanf("%d", &x);
+        root = insert(root, x);
     }
 
-    int max = 0;
-    int range = coords[n - 1] - coords[0] + 1;
-    while (range - max > 1) {
-        int m = (max + range) / 2;
-        if (check(coords, n, k, m))
-            max = m;
-        else
-            range = m;
-    }
-    cout << max;
+    traverse(root);
 
     return 0;
+}
+
+Node *insert(Node *parent, T k) {
+    if (parent == nullptr) {
+        return new Node(k);
+    } else if (k < parent->key) {
+        parent->left = insert(parent->left, k);
+        parent->left->parent = parent;
+    } else {
+        parent->right = insert(parent->right, k);
+        parent->right->parent = parent;
+    }
+    return parent;
+}
+
+void traverse(Node *root) {
+    unsigned level = 1;
+    for (Node *node = root, *prev = nullptr;
+         node != nullptr && node != prev;
+         prev = node, node = next(node, level, ++level)) {
+        printf("%d ", node->key);
+    }
+}
+
+Node *next(Node *base, unsigned current, const unsigned target) {
+    for (; base != nullptr;) {
+        if (base->right != nullptr && current + 1 >= target) {
+            return base->right;
+        } else if (base->left != nullptr && current + 1 >= target) {
+            return base->left;
+        } else if (base->right != nullptr) {
+            base = base->right;
+            ++current;
+            continue;
+        } else if (base->left != nullptr) {
+            base = base->left;
+            ++current;
+            continue;
+        } else {
+            auto *parent = base->parent;
+            if (parent != nullptr) {
+                if (parent->right == base) {
+                    parent->right = nullptr;
+                    base = parent;
+                    --current;
+                    continue;
+                } else {
+                    parent->left = nullptr;
+                    base = parent;
+                    --current;
+                    continue;
+                }
+            } else {
+                if (base->right != nullptr) {
+                    base = base->right;
+                    ++current;
+                    continue;
+                } else if (base->left != nullptr) {
+                    base = base->left;
+                    ++current;
+                    continue;
+                } else {
+                    return nullptr;
+                }
+            }
+        }
+    }
+    return nullptr;
 }
