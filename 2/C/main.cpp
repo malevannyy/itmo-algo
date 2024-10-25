@@ -46,7 +46,7 @@ int main() {
 Node *insert(Node *parent, T k) {
     if (parent == nullptr) {
         return new Node(k);
-    } else if (k < parent->key) {
+    } else if (k <= parent->key) {
         parent->left = insert(parent->left, k);
         parent->left->parent = parent;
     } else {

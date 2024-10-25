@@ -1,6 +1,6 @@
 #include <iostream>
 #include <chrono>
-#include "main.cpp"
+#include "2/C/main.cpp"
 
 #define nl '\n'
 
