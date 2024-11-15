@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.28)
 project(algo)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 #add_executable(algo_2c 2/C/main.cpp)
 #add_executable(algo_2d 2/D/bst-preorder.cpp)
 #add_executable(algo_2e 2/E/parent.cpp)
-add_executable(algo_3A 3/A/main.cpp)
+
+#3
+#add_executable(algo_3A 3/A/main.cpp)
+add_executable(algo_3B 3/B/main.cpp)
