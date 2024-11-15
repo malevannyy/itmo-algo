@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <climits>
 
 #define K int
 #define V int
@@ -81,7 +80,7 @@ public:
                 if (prev != nullptr) {
                     prev->next = node->next;
                 } else {
-                    table[ix(key)] = nullptr;
+                    table[ix(key)] = node->next;
                 }
                 delete node;
                 return old;
@@ -89,13 +88,25 @@ public:
         }
         throw key;
     }
+
+    V maxValue() {
+        V max = 0;
+        for (int i = 0; i < size; i++) {
+            for (Node *node = table[i]; node != nullptr; node = node->next) {
+                if (node->value > max) {
+                    max = node->value;
+                };
+            }
+        }
+        return max;
+    }
 };
 
 class Group {
 private:
     int _count = 0;
     int _sum = 0;
-    int _max = INT_MIN;
+    int _max = 0;
     bool _consistent = true;
     HashMap *map = new HashMap();
 public:
@@ -117,7 +128,7 @@ public:
         _sum -= value;
         _count--;
         if (value >= _max) {
-            // todo rescan values for new max
+            _max = map->maxValue();
         }
 
     }
@@ -127,7 +138,7 @@ public:
     }
 
     int avg() {
-        return _sum / _count;
+        return _count == 0 ? 0 :_sum / _count;
     }
 };
 
@@ -169,7 +180,3 @@ int main(int argc, char **argv) {
         }
     }
 }
-
-
-
-
