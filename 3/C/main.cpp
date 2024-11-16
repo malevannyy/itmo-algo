@@ -4,59 +4,8 @@
 #pragma ide diagnostic ignored "MemoryLeak"
 
 #define K int
-#define V HashSet
+#define V int
 const int SIZE = 256;
-
-class HashSet {
-private:
-    struct Node {
-        K key;
-        Node *next;
-
-        explicit Node(K key) {
-            this->key = key;
-            this->next = nullptr;
-        }
-
-        ~Node() = default;
-    };
-
-    Node *table[SIZE];
-
-    static inline int ix(int key) {
-        return key & (SIZE - 1);
-    }
-
-public:
-    HashSet() = default;
-
-    bool contains(K key) {
-        for (Node *node = table[ix(key)]; node != nullptr; node = node->next) {
-            if (node->key == key) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool add(K key) {
-        Node *prev = nullptr;
-        for (Node *node = table[ix(key)];
-             node != nullptr;
-             prev = node, node = node->next) {
-            if (node->key == key) {
-                return false;
-            }
-        }
-        auto node = new Node(key);
-        if (prev != nullptr) {
-            prev->next = node;
-        } else {
-            table[ix(key)] = node;
-        }
-        return true;
-    }
-};
 
 class HashMap {
 private:
@@ -75,15 +24,11 @@ private:
     };
 
     Node *table[SIZE];
+    int size = 0;
 
     static inline int ix(int key) {
         return key & (SIZE - 1);
     }
-
-public:
-    HashMap() = default;
-
-    int size = 0;
 
     void put(K key, V *value) {
         Node *prev = nullptr;
@@ -102,6 +47,8 @@ public:
         }
         size++;
     }
+
+public:
 
     V *get(K key) {
         for (Node *node = table[ix(key)]; node != nullptr; node = node->next) {
@@ -123,56 +70,83 @@ public:
         }
     }
 
-    int iteratorIndex = SIZE;
-    Node *iteratorNode = nullptr;
+    class Iterator {
+    private:
+        HashMap *map;
+        int index = -1;
+        Node *node = nullptr;
+    public:
+        explicit Iterator(HashMap *map) {
+            this->map = map;
+        }
 
-    Node *next() {
-        iteratorNode = iteratorNode != nullptr ? iteratorNode->next : nullptr;
-        if (iteratorNode != nullptr) {
-            return iteratorNode;
-        }
-        for (--iteratorIndex; iteratorIndex >= 0; --iteratorIndex) {
-            iteratorNode = table[iteratorIndex];
-            if (iteratorNode != nullptr) {
-                return iteratorNode;
+        Node *next() {
+            node = node != nullptr ? node->next : nullptr;
+            if (node != nullptr) {
+                return node;
             }
+            for (++index; index < SIZE; index++) {
+                node = map->table[index];
+                if (node != nullptr) {
+                    return node;
+                }
+            }
+            return nullptr;
         }
-        return nullptr;
+    };
+
+    Iterator *iterator() {
+        return new Iterator(this);
     }
 };
+
+long choose(int n);
+
+long f(int i);
 
 int main() {
 
     int n;
     scanf("%d", &n);
+    int k = n - 1;
     auto map = new HashMap();
     for (int i = 0; i < n; i++) {
         int h;
         scanf("%d", &h);
-        map->computeNew(h)->add(i);
+        (*map->computeNew(h + k - i))++;
     }
 
-    int keysCount = map->size;
-    K keys[keysCount];
-    for (int i = 0; i < keysCount; i++) {
-        keys[i] = map->next()->key;
-    }
+    auto count = 0L;
 
-    auto count = 0;
-
-    for (int j = 0; j < keysCount; j++) {
-        for (int i = 0; i < keysCount; i++) {
-            if(j == i) continue;
-
-            int hj = keys[j];
-            auto js = map->get(hj);
-            int hi = keys[i];
-            auto is = map->get(hi);
-
-            printf("");
+    for (auto iterator = map->iterator();;) {
+        auto node = iterator->next();
+        if (node == nullptr) break;
+        auto v = *node->value;
+        if (v > 1) {
+            count += choose(v);
         }
     }
 
 
-    printf("%d", count);
+    printf("%d", (int) count);
+}
+
+long choose(int n) {
+    long f2 = f(n - 2);
+    return f2 * n * (n - 1) / (2 * f2);
+}
+
+
+long f(int i) {
+    if (i < 2) {
+        return 1;
+    } else if (i > 20) {
+        throw i;
+    } else {
+        long a = 1;
+        for (; i > 1; --i) {
+            a *= i;
+        }
+        return a;
+    }
 }
