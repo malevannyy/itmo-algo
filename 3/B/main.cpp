@@ -5,7 +5,7 @@
 
 #pragma ide diagnostic ignored "cert-err34-c"
 
-class HashMap {
+class HashMap1 {
 private:
     struct Node {
         int hash;
