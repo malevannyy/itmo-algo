@@ -1,10 +1,13 @@
 #include <cstdio>
+#include <iostream>
+
+using namespace std;
 
 #pragma ide diagnostic ignored "cert-err34-foo"
 
-const auto magic_number = 17u;
-const auto odd_number = 15u;
-const auto odd_mask = (1u << odd_number) - 1;
+const auto m = 6u; // 100000
+const auto magic_number = 3u;
+const auto magic_mask = (1u << magic_number) - 1;
 const auto number = 1u << magic_number;
 
 unsigned a[number]{};
@@ -13,33 +16,47 @@ unsigned foo(unsigned);
 
 int main() {
     unsigned n;
+    unsigned shift = 1;
     unsigned count = 0;
     unsigned old_imagine;
     scanf("%d", &n);
-    for (unsigned i = 0; i < n; i++) {
+    for (; shift < n; shift <<= 1);
+    // shift <<= magic_number;
+    cout << " 35  36  31  33  34  33  29  30  25  27  28  27  23  24  19  21  22  21\n";
+    cout << " 20  21  16  18  19  18  14  15  10  12  13  12   8   9   4   6   7   6\n";
+
+    for (unsigned i = n; i > 0; i--) {
         unsigned hi;
         scanf("%d", &hi);
-        auto x = hi - i + n;
-        auto imagine = x / magic_number; // >> betta
-        auto real = x % magic_number; // &
+        auto x = hi + i - 1;
 
-        old_imagine = a[real] >> odd_number;
+        cout << " " << x << " ";
+        cout.flush();
+
+        auto imagine = x >> magic_number;
+        auto real = x & magic_mask;
+
+        // cout << imagine << '|' << real << " ";
+        cout.flush();
+
+        old_imagine = a[real] >> magic_number;
 
         if (imagine == old_imagine) {
             a[real]++;
         } else {
-            count = +foo(a[real] & odd_mask);
-            a[real] = (imagine << odd_number) + 1;
+            count = +foo(a[real] & magic_mask);
+            a[real] = (imagine << magic_number) + 1;
         }
     }
 
     for (unsigned ic: a) {
-        auto imagine = ic >> odd_number;
+        auto imagine = ic >> magic_number;
         if (imagine == old_imagine) {
-            count += foo(ic & odd_mask);
+            count += foo(ic & magic_mask);
         }
     }
 
+    printf("\n");
     printf("%u", count);
 }
 
