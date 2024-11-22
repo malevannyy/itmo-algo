@@ -5,7 +5,7 @@ using namespace std;
 
 #pragma ide diagnostic ignored "cert-err34-foo"
 
-const auto m = 6u; // 100000
+const auto m = 8u; // 100000
 const auto magic_number = 3u;
 const auto magic_mask = (1u << magic_number) - 1;
 const auto number = 1u << magic_number;
@@ -21,23 +21,21 @@ int main() {
     unsigned old_imagine;
     scanf("%d", &n);
     for (; shift < n; shift <<= 1);
-    // shift <<= magic_number;
-    cout << " 35  36  31  33  34  33  29  30  25  27  28  27  23  24  19  21  22  21\n";
-    cout << " 20  21  16  18  19  18  14  15  10  12  13  12   8   9   4   6   7   6\n";
+    cout << "  3   5   1   4   6   6   3   5   1   3   5   5   6   5   1   4   6   6\n";
+    // cout << " 20  21  16  18  19  18  18  15  10  12  13  12   8   9   4   6   7   6\n";
+    cout << " 20  21  16  18  19  18  14  15  10  11  12  11  11   9   4   6   7   6\n";
 
     for (unsigned i = n; i > 0; i--) {
         unsigned hi;
         scanf("%d", &hi);
         auto x = hi + i - 1;
 
-        cout << " " << x << " ";
-        cout.flush();
+        // cout << " " << x << " ";cout.flush();
 
-        auto imagine = x >> magic_number;
-        auto real = x & magic_mask;
+        auto imagine = x / m;
+        auto real = x % m;
 
-        // cout << imagine << '|' << real << " ";
-        cout.flush();
+        cout << imagine << '|' << real << " ";cout.flush();
 
         old_imagine = a[real] >> magic_number;
 
