@@ -1,125 +1,48 @@
 #include <cstdio>
 
-#pragma ide diagnostic ignored "cert-err34-c"
-#pragma ide diagnostic ignored "MemoryLeak"
+#pragma ide diagnostic ignored "cert-err34-foo"
 
-#define K int
-#define V int
-const int SIZE = 256;
+const auto magic_number = 17u;
+const auto odd_number = 15u;
+const auto odd_mask = (1u << odd_number) - 1;
+const auto number = 1u << magic_number;
 
-class HashMap {
-private:
-    struct Node {
-        K key;
-        V value;
-        Node *next;
+unsigned a[number]{};
 
-        Node(K key, V value) {
-            this->key = key;
-            this->value = value;
-            this->next = nullptr;
-        }
-
-        ~Node() = default;
-    };
-
-    Node *table[SIZE];
-    int size = 0;
-
-    static inline int ix(int key) {
-        return key & (SIZE - 1);
-    }
-
-    void put(K key, V value) {
-        Node *prev = nullptr;
-        for (Node *node = table[ix(key)];
-             node != nullptr;
-             prev = node, node = node->next) {
-            if (node->key == key) {
-                node->value = value;
-            }
-        }
-        auto node = new Node(key, value);
-        if (prev != nullptr) {
-            prev->next = node;
-        } else {
-            table[ix(key)] = node;
-        }
-        size++;
-    }
-
-public:
-
-    Node *find(K key) {
-        for (Node *node = table[ix(key)]; node != nullptr; node = node->next) {
-            if (node->key == key) {
-                return node;
-            }
-        }
-        return nullptr;
-    }
-
-    void computeNewOrIncrement(K key) {
-        auto node = find(key);
-        if (node != nullptr) {
-            node->value++;
-        } else {
-            put(key, 1);
-        }
-    }
-
-    class Iterator {
-    private:
-        HashMap *map;
-        int index = -1;
-        Node *node = nullptr;
-    public:
-        explicit Iterator(HashMap *map) {
-            this->map = map;
-        }
-
-        Node *next() {
-            node = node != nullptr ? node->next : nullptr;
-            if (node != nullptr) {
-                return node;
-            }
-            for (++index; index < SIZE; index++) {
-                node = map->table[index];
-                if (node != nullptr) {
-                    return node;
-                }
-            }
-            return nullptr;
-        }
-    };
-
-    Iterator *iterator() {
-        return new Iterator(this);
-    }
-};
+unsigned foo(unsigned);
 
 int main() {
-
-    int n;
+    unsigned n;
+    unsigned count = 0;
+    unsigned old_imagine;
     scanf("%d", &n);
-    auto map = new HashMap();
-    for (int i = 0; i < n; i++) {
-        int h;
-        scanf("%d", &h);
-        map->computeNewOrIncrement(h - i);
-    }
+    for (unsigned i = 0; i < n; i++) {
+        unsigned hi;
+        scanf("%d", &hi);
+        auto x = hi - i + n;
+        auto imagine = x / magic_number; // >> betta
+        auto real = x % magic_number; // &
 
-    auto count = 0L;
+        old_imagine = a[real] >> odd_number;
 
-    for (auto iterator = map->iterator();;) {
-        auto node = iterator->next();
-        if (node == nullptr) break;
-        auto v = node->value;
-        if (v > 1) {
-            count += v * (v - 1) / 2;
+        if (imagine == old_imagine) {
+            a[real]++;
+        } else {
+            count = +foo(a[real] & odd_mask);
+            a[real] = (imagine << odd_number) + 1;
         }
     }
 
+    for (unsigned ic: a) {
+        auto imagine = ic >> odd_number;
+        if (imagine == old_imagine) {
+            count += foo(ic & odd_mask);
+        }
+    }
 
-    printf("%d", (int) count);
+    printf("%u", count);
+}
+
+unsigned foo(unsigned n) {
+    return n < 2 ? 0 : n * (n - 1) / 2;
 }
