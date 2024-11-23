@@ -1,14 +1,26 @@
+/**
+ * Кураторы Бибы и Бобы идя с лекции по хешам курили что-то запрещенное и
+ * допустили две логические ошибки в условии задачи и как следствие тестах
+ *
+ * 1) между двумя стульями НЕТ стульев вообще,
+ *    однако кураторам привиделся еще один ВНЕЗАПНО,
+ *
+ * 2) в формуле не хватает модуля, она не учитыват
+ *    тот факт что стулья могут стоять убывающим порядком
+ *
+ * Всё это прискорбно.
+ *
+ * ---
+ * Commander Lambda
+ */
+
 #include <cstdio>
-#include <iostream>
 
 using namespace std;
 
-#pragma ide diagnostic ignored "cert-err34-foo"
-
-const auto m = 8u; // 100000
-const auto magic_number = 3u; // 17 depends on m
+const auto magic_number = 17u; // 3
 const auto magic_mask = (1u << magic_number) - 1;
-const auto number = 1u << magic_number;
+const auto number = 1u << magic_number; // 100000 // 6
 
 unsigned a[number]{};
 
@@ -18,30 +30,16 @@ int main() {
     unsigned n;
     unsigned shift = 1;
     unsigned count = 0;
-    unsigned old_imagine;
     scanf("%d", &n);
     for (; shift < n; shift <<= 1);
-    cout
-            << "  3   5   1   4   6   6   3   5   1   3   5   5   6   5   1   4   6   6\n";
-    // cout << " 20  21  16  18  19  18  18  15  10  12  13  12   8   9   4   6   7   6\n";
-    cout
-            << " 20  21  16  18  19  18  14  15  10  11  12  11  11   9   4   6   7   6\n";
 
     for (unsigned i = n; i > 0; i--) {
         unsigned hi;
         scanf("%d", &hi);
         auto x = hi + i - 1;
-
-        // cout << " " << x << " ";cout.flush();
-
-        auto imagine = x / m;
-        auto real = x % m;
-
-        cout << imagine << '|' << real << " ";
-        cout.flush();
-
-        old_imagine = a[real] >> magic_number;
-
+        auto imagine = x / number;
+        auto real = x % number;
+        auto old_imagine = a[real] >> magic_number;
         if (imagine == old_imagine) {
             a[real]++;
         } else {
@@ -56,7 +54,6 @@ int main() {
         count += foo(accum);
     }
 
-    printf("\n");
     printf("%u", count);
 }
 
