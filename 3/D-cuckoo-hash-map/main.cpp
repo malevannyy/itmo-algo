@@ -1,12 +1,3 @@
-// если задача написана только у одного студента,
-// то этот студент получает 3 балла, поскольку эту задачу он не списывал и не давал списывать;
-//
-// если задача списана ровно у двух студентов,
-// то каждый из них получает по 1 утешительному баллу;
-//
-// если задача списана всеми тремя студентами,
-// то за нее баллы не начисляются никому.
-
 #include <cstdio>
 #include <iostream>
 #include <string>
@@ -17,7 +8,7 @@ using namespace std;
 #define V int
 
 class CuckooHashMap {
-    static const int SIZE = 256;
+    static const int SIZE = 16;
 
     struct Entry {
         K key;
@@ -79,18 +70,19 @@ int main() {
 
     V scores[fc]{};
 
-    // todo: manna giving
+    // manna giving
     for (int j = 0; j < fc; j++) {
         for (int i = 0; i < n; i++) {
             K k = friends[j][i];
             V v = map->get(k);
+            // prod: if (v > fc) throw v;
             cout << k << ':' << v << ' ';
             scores[j] += verdict(v);
         }
         cout << '\n';
     }
 
-    // result
+    // result out
     for (unsigned int score: scores) {
         cout << score << ' ';
     }
