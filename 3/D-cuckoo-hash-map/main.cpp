@@ -8,7 +8,7 @@ using namespace std;
 #define V int
 
 class CuckooHashMap {
-    static const int SIZE = 16;
+    static const int SIZE = 4;
 
     struct Entry {
         K key;
@@ -30,23 +30,63 @@ class CuckooHashMap {
 
     Entry *a[SIZE]{};
 
+    const int limit = SIZE / 4;
+
+    Entry *bump(Entry *entry, char &fn) {
+        unsigned h;
+        if (fn == 1) {
+            h = f1(entry->key);
+            fn = 2;
+        } else {
+            h = f2(entry->key);
+            fn = 1;
+        }
+
+        if (a[h] == nullptr) {
+            a[h] = entry;
+            return nullptr;
+        } else {
+            auto save = a[h];
+            a[h] = entry;
+            return save;
+        }
+    }
+
+    bool cuckoo(Entry *entry, Entry *nova) {
+        char fn = 2;
+        auto h = f2(nova->key);
+        a[h] = nova;
+        for (int c = 0; c < limit; c++) {
+            entry = bump(entry, fn);
+            if (entry == nullptr) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void rehash() {
+        throw "rehash";
+    }
+
 public:
     CuckooHashMap() = default;
 
     V get(K k) {
-        auto v1 = a[f1(k)]->value;
-        return v1 > 0 ? v1 : a[f2(k)]->value;
+        auto e1 = a[f1(k)];
+        auto e2 = a[f2(k)];
+        if (e1 != nullptr && e1->key == k) {
+            return e1->value;
+        } else if (e2 != nullptr && e2->key == k) {
+            return e2->value;
+        } else return 0;
     };
-
-    bool cuckoo(K k) {
-        return false;
-    }
 
     void computeInc(K k) {
         unsigned int h1 = f1(k);
         unsigned int h2 = f2(k);
         auto entry1 = a[h1];
-        auto entry2 = a[h1];
+        auto entry2 = a[h2];
         if (entry1 == nullptr) {
             a[h1] = new Entry(k, 1);
         } else if (entry1->key == k) {
@@ -57,10 +97,11 @@ public:
         } else if (entry2->key == k) {
             V &v = entry2->value;
             v++;
-        } else if (cuckoo(k)) {
+        } else if (cuckoo(entry2, new Entry(k, 1))) {
+            // ok
         } else {
-            cout << "todo: rehash\n";
-            ///rehash(k);
+            rehash();
+            computeInc(k);
         }
     }
 };
