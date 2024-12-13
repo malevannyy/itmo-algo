@@ -1,14 +1,14 @@
 #include <cstdio>
 #include <iostream>
-#include <string>
 
 using namespace std;
 
-#define K unsigned long
+#define K unsigned // long
 #define V int
 
 class CuckooHashMap {
-    static const int SIZE = 4;
+    static const int SIZE = 1024;
+    static const int limit = 8;
 
     struct Entry {
         K key;
@@ -29,8 +29,6 @@ class CuckooHashMap {
     }
 
     Entry *a[SIZE]{};
-
-    const int limit = SIZE / 4;
 
     Entry *bump(Entry *entry, char &fn) {
         unsigned h;
@@ -66,7 +64,7 @@ class CuckooHashMap {
     }
 
     void rehash() {
-        throw "rehash";
+        // throw "rehash";
     }
 
 public:
@@ -106,16 +104,18 @@ public:
     }
 };
 
-unsigned long read_string();
+K read_string();
 
 V verdict(V i);
 
 const unsigned int fc = 3;
 
 int main() {
+
     // 1 ≤ n ≤ 100000
     unsigned n;
     scanf("%d", &n);
+    getchar();
     auto map = new CuckooHashMap();
 
     K friends[fc][n];
@@ -136,34 +136,31 @@ int main() {
         for (int i = 0; i < n; i++) {
             K k = friends[j][i];
             V v = map->get(k);
-            // prod: if (v > fc) throw v;
-            cout << k << ':' << v << ' ';
+            // cout << k << ':' << v << ' ';
             scores[j] += verdict(v);
         }
-        cout << '\n';
+        // cout << '\n';
     }
 
     // result out
     for (unsigned int score: scores) {
         cout << score << ' ';
     }
-    cout << '\n';
-
-
 }
 
 const unsigned long magic_number = 13;
 
-unsigned long read_string() {
+K read_string() {
     unsigned long x = 0;
-    string s;
-    cin >> s;
-    auto size = s.size();
+    int c;
     unsigned long y = 1;
-    for (int i = 0; i < size; i++) {
-        x += y * s[i];
+    for (;;) {
+        c = getchar();
+        if (c < 0 || c == ' ' || c == '\n') break;
+        x += y * c;
         y *= magic_number;
     }
+
     return x;
 }
 
