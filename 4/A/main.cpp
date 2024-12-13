@@ -1,65 +1,47 @@
 #include <iostream>
-
+#include <vector>
+#define T vector<int>
 using namespace std;
 
-// bcababa
-// aba
+T prefix_fun(string s) {
+    int n = (int) s.size();
+    vector<int> p(n, 0);
+    for (int i = 1; i < n; i++) {
+        int cur = p[i - 1];
+        while (s[i] != s[cur] && cur > 0)
+            cur = p[cur - 1];
+        if (s[i] == s[cur])
+            p[i] = cur + 1;
+    }
+    return p;
+}
 
-// Коммандер Ламбда негодует:
-// Если поменять аргументы местами то можно в 2 раза снизить потребление памати
-// А так, это унылое придётся буферизировать в памяти
-// Как и требование сначала посчитать индексы а потом их вывести, ]=E
-
-// Длина строк не превосходит 2*10^5
-
-static const auto magic_number = 0x60;
-static const int mod = INT32_MAX;
-static const int k = 10;
-
-int h(const char *, int, int);
+void foo(T a) {
+    for(int i = 0; i<a.size(); i++) {
+        cout << a[i];
+    }
+    cout << endl;
+}
 
 int main() {
 
-    auto bullshit_max = 200000;
-    int bullshit[bullshit_max];
+    int bullshit[200000];
     auto bullshit_index = 0;
 
     string t;
     string s;
     getline(cin, t);
     getline(cin, s);
-    auto sl = (int) s.length(); // 3
-    auto d = (int) t.length() - sl;
-    auto a = t.c_str();
-    auto hs = h(s.c_str(), 0, sl);
-    auto kpsl = (int) pow(k, sl - 1);
-    for (int j = 0, hp = h(a, j, j + sl); j <= d; j++) {
-        if (j > 0) {
-            auto x = (int) (a[j + sl - 1] - magic_number);
-            auto dh = (x * kpsl) % mod;
-            hp = dh + (hp - (a[j - 1] - magic_number)) / k;
-        }
 
-        if (hp == hs) {
-            bullshit[bullshit_index++] = j;
-        }
-    }
+    auto x = prefix_fun(t);
+    auto y = prefix_fun(s);
+    auto z = prefix_fun(s + "|" + t);
+
+    foo(z);
 
     cout << bullshit_index << endl;
     for (int index = 0; index < bullshit_index; index++) {
-        cout << bullshit[index] << " ";
+        cout << bullshit[index] << ' ';
     }
 
-}
-
-int h(const char *a, int from, int to) {
-    int h = 0;
-    int p = 1; // = any.pow(0)
-    for (auto i = from; i < to; i++) {
-        auto x = (int) (a[i] - magic_number);
-        h = (h + p * x) % mod;
-        p = (p * k) % mod;
-    }
-
-    return h;
 }
