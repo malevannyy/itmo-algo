@@ -22,6 +22,29 @@ void foo(int *a, int n) {
     cout << endl;
 }
 
+void bar(int a, int l, int sl) {
+    for (int i = 0; i <= l; i++) {
+        cout << ' ';
+    }
+    for (int i = 0; i < sl - l - 1; i++) {
+        char c = '.';
+        if (i >= a && i < a + l) {
+            c = '-';
+        }
+
+        cout << c;
+    }
+    cout << endl;
+}
+
+void zoo(int n) {
+    for (int i = 0; i < n; i++) {
+        cout << (i % 10);
+    }
+    cout << endl;
+}
+
+
 int main() {
     // длина текста песни ≤1e6
     int n;
@@ -33,14 +56,23 @@ int main() {
     getline(cin, origin);
     int count = 0;
 
-    int pf[n];
-    prefix_fun(pf, origin.c_str(), n);
-
     for (int j = 0; j < m; j++) {
         int a, b, l;
         cin >> a >> b >> l;
 
-        if (pf[a - 1 + l] == l && pf[b - 1 + l] == l) {
+        auto prefix = origin.substr(a - 1, a - 1 + l);
+        auto s = prefix + "|" + origin;
+        auto sl = (int) s.length();
+        int pf[sl];
+        prefix_fun(pf, s.c_str(), sl);
+
+        zoo(sl);
+        cout << s << endl;
+        foo(pf, sl);
+        bar(a - 1, l, sl);
+        bar(b - 1, l, sl);
+
+        if (pf[b - 1 + l + l] == l && pf[a - 1 + l + l] == l) {
             count++;
         }
 
