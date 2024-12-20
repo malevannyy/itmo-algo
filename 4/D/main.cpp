@@ -10,14 +10,12 @@ class Processor {
     struct Vertex {
         char c;
         bool fin;
-        int index = -1;
         Vertex *parent = nullptr;
         Vertex *children[alphabet_size] = {nullptr};
 
         Vertex() {
             c = 0;
             fin = false;
-            index = -1;
             parent = nullptr;
         }
 
@@ -32,7 +30,13 @@ class Processor {
     unsigned word_count = 0;
     unsigned max_length = 0;
     Vertex *root = new Vertex();
-    // todo index
+    Vertex **index = nullptr;
+
+    void clear_index() const {
+        if (index != nullptr) {
+            delete index;
+        }
+    }
 
     void count_max_length(const string &s) {
         auto length = s.length();
@@ -53,23 +57,59 @@ class Processor {
         return child;
     }
 
+    void rebuild(Vertex *vertex, unsigned &current) {
+        if (vertex == nullptr) return;
+
+        if (vertex->fin) {
+            index[current++] = vertex;
+        }
+
+        for (auto child: vertex->children) {
+            rebuild(child, current);
+        }
+    }
+
+    void rebuild_index() {
+        unsigned current = 0;
+        index = new Vertex *[word_count];
+        rebuild(root, current);
+    }
+
+    // ugly olympic stuff
+    void print_word(Vertex *vertex) {
+        char buf[max_length + 1];
+        buf[max_length] = 0;
+        char *pointer;;
+        for (pointer = &buf[max_length - 1]; vertex != root; pointer--) {
+            *pointer = vertex->c;
+            vertex = vertex->parent;
+        }
+
+        cout << ++pointer << '\n';
+    }
+
 public:
     void accept(const string &s) {
         auto parent = root;
         for (unsigned i = 0, l = s.length() - 1; i <= l; i++) {
             parent = accept(parent, s[i], i == l);
         }
+        clear_index();
         count_max_length(s);
         word_count++;
-        // todo clear index
     }
 
-
     void get(int i) {
-        char buf[max_length];
+        if (index == nullptr) {
+            rebuild_index();
+        }
 
-        // ugly olympic stuff
-        cout << buf;
+        if (i < word_count) {
+            auto ende = index[i];
+            if (ende != nullptr) {
+                print_word(ende);
+            }
+        }
     }
 };
 
@@ -86,7 +126,7 @@ int main() {
             processor->accept(input);
             input.clear();
         } else {
-            int i = atoi(input.c_str());
+            int i = atoi(input.c_str()) - 1;
             processor->get(i);
         }
     }
