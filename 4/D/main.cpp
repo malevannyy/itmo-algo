@@ -11,7 +11,7 @@ class Processor {
         char c;
         bool fin;
         Vertex *parent = nullptr;
-        Vertex *children[alphabet_size] = {nullptr};
+        Vertex **children = nullptr;
 
         Vertex() {
             c = 0;
@@ -41,6 +41,9 @@ class Processor {
 
     static Vertex *accept(Vertex *parent, char c, bool fin) {
         unsigned i = c - a;
+        if (parent->children == nullptr) {
+            parent->children = new Vertex *[alphabet_size]{nullptr};
+        }
         auto child = parent->children[i];
         if (child != nullptr) {
             child->fin |= fin;
@@ -58,8 +61,13 @@ class Processor {
             index[current++] = vertex;
         }
 
-        for (auto child: vertex->children) {
-            rebuild(child, current);
+        if (vertex->children != nullptr) {
+            for (int i = 0; i < alphabet_size; i++) {
+                auto child = vertex->children[i];
+                if (child != nullptr) {
+                    rebuild(child, current);
+                }
+            }
         }
     }
 
@@ -73,7 +81,7 @@ class Processor {
     void print_word(Vertex *vertex) {
         char buf[max_length + 1];
         buf[max_length] = 0;
-        char *pointer;;
+        char *pointer;
         for (pointer = &buf[max_length - 1]; vertex != root; pointer--) {
             *pointer = vertex->c;
             vertex = vertex->parent;
@@ -90,7 +98,7 @@ public:
         }
         count_max_length(s);
         word_count++;
-        if(index != nullptr) {
+        if (index != nullptr) {
             delete index;
             index = nullptr;
         }
