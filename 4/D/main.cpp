@@ -32,12 +32,6 @@ class Processor {
     Vertex *root = new Vertex();
     Vertex **index = nullptr;
 
-    void clear_index() const {
-        if (index != nullptr) {
-            delete index;
-        }
-    }
-
     void count_max_length(const string &s) {
         auto length = s.length();
         if (length > max_length) {
@@ -94,9 +88,12 @@ public:
         for (unsigned i = 0, l = s.length() - 1; i <= l; i++) {
             parent = accept(parent, s[i], i == l);
         }
-        clear_index();
         count_max_length(s);
         word_count++;
+        if(index != nullptr) {
+            delete index;
+            index = nullptr;
+        }
     }
 
     void get(int i) {
