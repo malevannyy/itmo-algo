@@ -2,17 +2,18 @@
 
 using namespace std;
 static const char a = 'a';
+static const char z = 'z';
 
 class Processor {
-    static const unsigned alphabet_size = 32;
+    static const unsigned alphabet_size = z - a + 1;
 
-    class Vertex {
+    struct Vertex {
         char c;
         bool fin;
         int index = -1;
         Vertex *parent = nullptr;
         Vertex *children[alphabet_size] = {nullptr};
-    public:
+
         Vertex() {
             c = 0;
             fin = false;
@@ -22,33 +23,50 @@ class Processor {
 
         Vertex(char c,
                bool fin,
-               int index,
                Vertex *parent = nullptr
         ) : c(c),
             fin(fin),
-            index(index),
             parent(parent) {}
     };
 
+    unsigned word_count = 0;
     unsigned max_length = 0;
     Vertex *root = new Vertex();
+    // todo index
 
-
-public:
-    void accept(const string &s) {
+    void count_max_length(const string &s) {
         auto length = s.length();
         if (length > max_length) {
             max_length = length;
         }
-
     }
+
+    static Vertex *accept(Vertex *parent, char c, bool fin) {
+        unsigned i = c - a;
+        auto child = parent->children[i];
+        if (child != nullptr) {
+            child->fin |= fin;
+        } else {
+            child = new Vertex(c, fin, parent);
+            parent->children[i] = child;
+        }
+        return child;
+    }
+
+public:
+    void accept(const string &s) {
+        auto parent = root;
+        for (unsigned i = 0, l = s.length() - 1; i <= l; i++) {
+            parent = accept(parent, s[i], i == l);
+        }
+        count_max_length(s);
+        word_count++;
+        // todo clear index
+    }
+
 
     void get(int i) {
         char buf[max_length];
-
-
-
-
 
         // ugly olympic stuff
         cout << buf;
