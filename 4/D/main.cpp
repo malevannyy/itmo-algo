@@ -27,19 +27,13 @@ class Processor {
             parent(parent) {}
     };
 
-    unsigned word_count = 0;
+    unsigned word_count;
     unsigned max_length = 0;
     Vertex *root = new Vertex();
-    Vertex **index = nullptr;
+    Vertex **index;
+    bool built = false;
 
-    void count_max_length(const string &s) {
-        auto length = s.length();
-        if (length > max_length) {
-            max_length = length;
-        }
-    }
-
-    static Vertex *accept(Vertex *parent, char c, bool fin) {
+    Vertex *accept(Vertex *parent, char c, bool fin) {
         unsigned i = c - a;
         if (parent->children == nullptr) {
             parent->children = new Vertex *[alphabet_size]{nullptr};
@@ -72,40 +66,45 @@ class Processor {
     }
 
     void rebuild_index() {
+        // clear? for what? contents would be overwritten
         unsigned current = 0;
-        index = new Vertex *[word_count];
         rebuild(root, current);
+        built = true;
     }
 
     // ugly olympic stuff
     void print_word(Vertex *vertex) {
         char buf[max_length + 1];
         buf[max_length] = 0;
-        char *pointer;
-        for (pointer = &buf[max_length - 1]; vertex != root; pointer--) {
-            *pointer = vertex->c;
+        char *p;
+        for (p = &buf[max_length - 1]; vertex != root; p--) {
+            *p = vertex->c;
             vertex = vertex->parent;
         }
 
-        cout << ++pointer << '\n';
+        cout << ++p << '\n';
     }
 
 public:
     void accept(const string &s) {
         auto parent = root;
-        for (unsigned i = 0, l = s.length() - 1; i <= l; i++) {
+        auto length = s.length();
+        for (unsigned i = 0, l = length - 1; i <= l; i++) {
             parent = accept(parent, s[i], i == l);
         }
-        count_max_length(s);
-        word_count++;
-        if (index != nullptr) {
-            delete index;
-            index = nullptr;
+
+        if (length > max_length) {
+            max_length = length;
         }
+
+        word_count++;
+
+        // fixme
+        built = false;
     }
 
     void get(int i) {
-        if (index == nullptr) {
+        if (!built) {
             rebuild_index();
         }
 
@@ -116,14 +115,17 @@ public:
             }
         }
     }
+
+    explicit Processor(const unsigned n) : word_count(n) {
+        index = new Vertex *[word_count];
+    }
 };
 
 int main() {
-    // query count ≤1e5
-    int n;
+    unsigned n;
     cin >> n;
     getchar();
-    auto processor = new Processor();
+    auto processor = new Processor(n);
     string input;
     for (int k = 0; k < n; k++) {
         cin >> input;
@@ -135,5 +137,6 @@ int main() {
             processor->get(i);
         }
     }
-    delete processor;
+    // ugly olympic stuff
+    // delete processor;
 }
