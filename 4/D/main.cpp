@@ -12,7 +12,6 @@ class Processor {
         bool fin;
         Vertex *parent = nullptr;
         Vertex **children = nullptr;
-        string str;
 
         Vertex() {
             c = 0;
@@ -40,20 +39,17 @@ class Processor {
         }
     }
 
-    static Vertex *accept(Vertex *parent, char c, bool fin, const string &s) {
+    static Vertex *accept(Vertex *parent, char c, bool fin) {
         unsigned i = c - a;
         if (parent->children == nullptr) {
             parent->children = new Vertex *[alphabet_size]{nullptr};
         }
         auto child = parent->children[i];
-        if (child != nullptr && fin) {
-            child->fin = fin;
+        if (child != nullptr) {
+            child->fin |= fin;
         } else {
             child = new Vertex(c, fin, parent);
             parent->children[i] = child;
-        }
-        if (fin) {
-            child->str = s;
         }
         return child;
     }
@@ -83,14 +79,22 @@ class Processor {
 
     // ugly olympic stuff
     void print_word(Vertex *vertex) {
-        cout << vertex->str << '\n';
+        char buf[max_length + 1];
+        buf[max_length] = 0;
+        char *pointer;
+        for (pointer = &buf[max_length - 1]; vertex != root; pointer--) {
+            *pointer = vertex->c;
+            vertex = vertex->parent;
+        }
+
+        cout << ++pointer << '\n';
     }
 
 public:
     void accept(const string &s) {
         auto parent = root;
         for (unsigned i = 0, l = s.length() - 1; i <= l; i++) {
-            parent = accept(parent, s[i], i == l, s);
+            parent = accept(parent, s[i], i == l);
         }
         count_max_length(s);
         word_count++;
@@ -120,8 +124,8 @@ int main() {
     cin >> n;
     getchar();
     auto processor = new Processor();
+    string input;
     for (int k = 0; k < n; k++) {
-        string input;
         cin >> input;
         if (input[0] >= a) {
             processor->accept(input);
