@@ -33,14 +33,16 @@ class Processor {
     Vertex **index;
     bool built = false;
 
-    Vertex *accept(Vertex *parent, char c, bool fin) {
+    Vertex *accept(Vertex *parent, char c, bool fin) { // NOLINT(*-convert-member-functions-to-static)
         unsigned i = c - a;
         if (parent->children == nullptr) {
-            parent->children = new Vertex *[alphabet_size]{nullptr};
+            parent->children = new Vertex *[alphabet_size]{};
         }
         auto child = parent->children[i];
         if (child != nullptr) {
-            child->fin |= fin;
+            if(fin) {
+                child->fin = fin;
+            }
         } else {
             child = new Vertex(c, fin, parent);
             parent->children[i] = child;
@@ -82,7 +84,8 @@ class Processor {
             vertex = vertex->parent;
         }
 
-        cout << ++p << '\n';
+        //printf(++p);
+        puts(++p);
     }
 
 public:
@@ -128,7 +131,7 @@ int main() {
     auto processor = new Processor(n);
     string input;
     for (int k = 0; k < n; k++) {
-        cin >> input;
+        getline(cin, input);
         if (input[0] >= a) {
             processor->accept(input);
             input.clear();
