@@ -1,15 +1,9 @@
-14
+8
 fab
-foo
-foot
 fun
 foo
-a
 f
 1
 2
 3
 4
-5
-6
-7

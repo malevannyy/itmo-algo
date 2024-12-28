@@ -17,6 +17,7 @@ class Processor {
         bool fin;
         Vertex *parent = nullptr;
         Vertex **children = nullptr;
+        Vertex *next = nullptr;
 
         Vertex() {
             c = 0;
@@ -70,8 +71,13 @@ class Processor {
     };
 
     Vertex *root = new Vertex();
+    Vertex *head = nullptr;
+
     unsigned word_count;
     unsigned max_length = 0;
+
+
+    // deprecated
     Vertex **index;
 
     Vertex *accept(Vertex *parent, char c, bool fin) {
@@ -114,14 +120,30 @@ public:
         }
 
         auto prev = vertex->find_prev_or_null();
+        // if (prev == nullptr) {
+        //     cout << nullptr << "->" << vertex->c << '\n';
+        // } else {
+        //     cout << prev->c << "->" << vertex->c << '\n';
+        // }
         if (prev == nullptr) {
-            cout << nullptr << "->" << vertex->c << '\n';
+            vertex->next = head;
+            head = vertex;
         } else {
-            cout << prev->c << "->" << vertex->c << '\n';;
+            vertex->next = prev->next;
+            prev->next = vertex;
         }
 
         if (length > max_length) {
             max_length = length;
+        }
+
+        // debug
+        {
+            cout << s << ": ";
+            for (auto p = head; p != nullptr; p = p->next) {
+                cout << p->c << "->";
+            }
+            cout << "null" << '\n';
         }
     }
 
