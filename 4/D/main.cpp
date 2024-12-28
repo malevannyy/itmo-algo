@@ -1,3 +1,8 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-no-recursion"
+#pragma ide diagnostic ignored "MemoryLeak"
+#pragma ide diagnostic ignored "readability-convert-member-functions-to-static"
+
 #include <iostream>
 
 using namespace std;
@@ -25,22 +30,58 @@ class Processor {
         ) : c(c),
             fin(fin),
             parent(parent) {}
+
+        Vertex *most_right_child_until_or_this(char right_bound = z + 1) {
+            if (this->children != nullptr) {
+                for (int i = right_bound - a - 1; i >= 0; --i) {
+                    auto w = this->children[i];
+                    if (w != nullptr) {
+                        return w;
+                    }
+                }
+            }
+            return this;
+        }
+
+        Vertex *find_prev_or_null() {
+            // up loop
+            Vertex *rop;
+            for (auto child = this, v = child->parent;
+                 v != nullptr;
+                 child = v, v = v->parent) {
+                rop = v->most_right_child_until_or_this(child->c);
+                if (rop->parent == nullptr) {
+                    return nullptr;
+                } else if (rop != v) {
+                    break;
+                } else if (rop->fin) {
+                    return rop;
+                }
+            }
+
+            // down loop
+            auto maybe_down = rop->most_right_child_until_or_this();
+            for (auto t = rop;
+                 maybe_down != t;
+                 t = maybe_down, maybe_down = maybe_down->most_right_child_until_or_this()) {
+            }
+            return maybe_down;
+        }
     };
 
+    Vertex *root = new Vertex();
     unsigned word_count;
     unsigned max_length = 0;
-    Vertex *root = new Vertex();
     Vertex **index;
-    bool built = false;
 
-    Vertex *accept(Vertex *parent, char c, bool fin) { // NOLINT(*-convert-member-functions-to-static)
+    Vertex *accept(Vertex *parent, char c, bool fin) {
         unsigned i = c - a;
         if (parent->children == nullptr) {
             parent->children = new Vertex *[alphabet_size]{};
         }
         auto child = parent->children[i];
         if (child != nullptr) {
-            if(fin) {
+            if (fin) {
                 child->fin = fin;
             }
         } else {
@@ -50,31 +91,6 @@ class Processor {
         return child;
     }
 
-    void rebuild(Vertex *vertex, unsigned &current) {
-        if (vertex == nullptr) return;
-
-        if (vertex->fin) {
-            index[current++] = vertex;
-        }
-
-        if (vertex->children != nullptr) {
-            for (int i = 0; i < alphabet_size; i++) {
-                auto child = vertex->children[i];
-                if (child != nullptr) {
-                    rebuild(child, current);
-                }
-            }
-        }
-    }
-
-    void rebuild_index() {
-        // clear? for what? contents would be overwritten
-        unsigned current = 0;
-        rebuild(root, current);
-        built = true;
-    }
-
-    // ugly olympic stuff
     void print_word(Vertex *vertex) {
         char buf[max_length + 1];
         buf[max_length] = 0;
@@ -84,32 +100,32 @@ class Processor {
             vertex = vertex->parent;
         }
 
-        //printf(++p);
         puts(++p);
     }
 
 public:
     void accept(const string &s) {
-        auto parent = root;
+        auto vertex = root;
         auto length = s.length();
+        char c;
         for (unsigned i = 0, l = length - 1; i <= l; i++) {
-            parent = accept(parent, s[i], i == l);
+            c = s[i];
+            vertex = accept(vertex, c, i == l);
+        }
+
+        auto prev = vertex->find_prev_or_null();
+        if (prev == nullptr) {
+            cout << nullptr << "->" << vertex->c << '\n';
+        } else {
+            cout << prev->c << "->" << vertex->c << '\n';;
         }
 
         if (length > max_length) {
             max_length = length;
         }
-
-        word_count++;
-
-        // fixme
-        built = false;
     }
 
-    void get(int i) {
-        if (!built) {
-            rebuild_index();
-        }
+    void print_out(int i) {
 
         if (i < word_count) {
             auto ende = index[i];
@@ -136,10 +152,10 @@ int main() {
             processor->accept(input);
             input.clear();
         } else {
-            int i = atoi(input.c_str()) - 1;
-            processor->get(i);
+            int i = atoi(input.c_str()) - 1; // NOLINT(*-err34-c)
+            processor->print_out(i);
         }
     }
-    // ugly olympic stuff
-    // delete processor;
 }
+
+#pragma clang diagnostic pop
