@@ -73,12 +73,8 @@ class Processor {
     Vertex *root = new Vertex();
     Vertex *head = nullptr;
 
-    unsigned word_count;
+    unsigned word_count = 0;
     unsigned max_length = 0;
-
-
-    // deprecated
-    Vertex **index;
 
     Vertex *accept(Vertex *parent, char c, bool fin) {
         unsigned i = c - a;
@@ -120,11 +116,6 @@ public:
         }
 
         auto prev = vertex->find_prev_or_null();
-        // if (prev == nullptr) {
-        //     cout << nullptr << "->" << vertex->c << '\n';
-        // } else {
-        //     cout << prev->c << "->" << vertex->c << '\n';
-        // }
         if (prev == nullptr) {
             vertex->next = head;
             head = vertex;
@@ -137,28 +128,24 @@ public:
             max_length = length;
         }
 
+        word_count++;
+
         // debug
-        {
-            cout << s << ": ";
-            for (auto p = head; p != nullptr; p = p->next) {
-                cout << p->c << "->";
-            }
-            cout << "null" << '\n';
-        }
+        // {
+        //     cout << s << ": ";
+        //     for (auto p = head; p != nullptr; p = p->next) {
+        //         cout << p->c << "->";
+        //     }
+        //     cout << "null" << '\n';
+        // }
     }
 
-    void print_out(int i) {
-
-        if (i < word_count) {
-            auto ende = index[i];
-            if (ende != nullptr) {
-                print_word(ende);
-            }
-        }
-    }
-
-    explicit Processor(const unsigned n) : word_count(n) {
-        index = new Vertex *[word_count];
+    void print_out(int n) {
+        auto v = head;
+        for (int i = 0;
+             i < n && i < word_count && v != nullptr;
+             i++, v = v->next);
+        print_word(v);
     }
 };
 
@@ -166,7 +153,7 @@ int main() {
     unsigned n;
     cin >> n;
     getchar();
-    auto processor = new Processor(n);
+    auto processor = new Processor();
     string input;
     for (int k = 0; k < n; k++) {
         getline(cin, input);
