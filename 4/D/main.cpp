@@ -73,6 +73,9 @@ class Processor {
     Vertex *root = new Vertex();
     Vertex *head = nullptr;
 
+    Vertex **discover = nullptr;
+    unsigned bound = 0;
+
     unsigned word_count = 0;
     unsigned max_length = 0;
 
@@ -138,22 +141,38 @@ public:
         //     }
         //     cout << "null" << '\n';
         // }
+
+        bound = 0;
     }
 
-    void print_out(int n) {
-        auto v = head;
-        for (int i = 0;
-             i < n && i < word_count && v != nullptr;
-             i++, v = v->next);
-        print_word(v);
+    void rebuild_till(unsigned n) {
+        for (auto v = bound == 0 ? head : discover[bound - 1]->next;
+             v != nullptr && bound <= n;
+             v = v->next, bound++) {
+            discover[bound] = v;
+        }
     }
+
+    void print_out(unsigned n) {
+        if (n < word_count) {
+            if (bound <= n) {
+                rebuild_till(n);
+            }
+            print_word(discover[n]);
+        }
+    }
+
+    explicit Processor(unsigned int n) {
+        discover = new Vertex *[n]{};
+    }
+
 };
 
 int main() {
     unsigned n;
     cin >> n;
     getchar();
-    auto processor = new Processor();
+    auto processor = new Processor(n);
     string input;
     for (int k = 0; k < n; k++) {
         getline(cin, input);
@@ -161,7 +180,7 @@ int main() {
             processor->accept(input);
             input.clear();
         } else {
-            int i = atoi(input.c_str()) - 1; // NOLINT(*-err34-c)
+            unsigned i = atoi(input.c_str()) - 1; // NOLINT(*-err34-c)
             processor->print_out(i);
         }
     }
